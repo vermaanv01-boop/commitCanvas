@@ -45,13 +45,68 @@ body {
     height: 100vh;
     pointer-events: none;
     z-index: 0;
-    opacity: 0.6;
+    opacity: 0.65;
     display: block;
+}
+
+/* Kinetic typography */
+.kinetic-typo {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    overflow: hidden;
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    color: rgba(32, 32, 30, 0.08);
+}
+
+.kinetic-line {
+    position: absolute;
+    font-size: clamp(6rem, 18vw, 14rem);
+    white-space: nowrap;
+    line-height: 0.9;
+}
+
+.kinetic-line-1 {
+    top: 10%;
+    left: -20%;
+    -webkit-text-stroke: 1px rgba(32, 32, 30, 0.12);
+    color: transparent;
+}
+
+.kinetic-line-2 {
+    top: 40%;
+    right: -30%;
+    color: rgba(32, 32, 30, 0.06);
+}
+
+.kinetic-line-3 {
+    bottom: 15%;
+    left: -40%;
+    -webkit-text-stroke: 1px rgba(198, 93, 59, 0.15);
+    color: transparent;
+}
+
+/* Ensure content sits above canvas and kinetic typo */
+.site-header,
+.main,
+.site-footer {
+    position: relative;
+    z-index: 1;
 }
 
 /* Static fallback for reduced motion */
 @media (prefers-reduced-motion: reduce) {
     .bg-canvas {
+        display: none;
+    }
+    .kinetic-typo {
         display: none;
     }
     body {
@@ -84,12 +139,12 @@ body {
     outline-offset: 2px;
 }
 
-/* Ensure content sits above canvas */
+/* Ensure content sits above canvas and kinetic typo */
 .site-header,
 .main,
 .site-footer {
     position: relative;
-    z-index: 1;
+    z-index: 2;
 }
 
 /* Header */
