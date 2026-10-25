@@ -467,6 +467,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 if (profileSection) {
                     profileSection.style.display = 'block';
+                    triggerProfileResponse();
                     if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
                         gsap.fromTo(profileSection, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power2.out' });
                         if (profileAvatar) gsap.from(profileAvatar, { scale: 0.8, opacity: 0, duration: 0.6, delay: 0.1 });
