@@ -1,10 +1,19 @@
-// CommitCanvas - GitHub REST API integration
-// Fetches public profile, repositories, aggregates languages and stars.
+// CommitCanvas - Motion-rich GitHub API integration with GSAP 3
 
 document.addEventListener('DOMContentLoaded', function() {
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+    
+    // GSAP setup
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
+        gsap.registerPlugin(ScrollTrigger);
+    }
+    
+    // Elements
     const searchForm = document.getElementById('githubSearchForm');
     const usernameInput = document.getElementById('githubUsername');
     const statusRegion = document.getElementById('searchStatus');
+    const searchButton = document.querySelector('.search-button');
     
     const profileSection = document.getElementById('profileSection');
     const analyticsSection = document.getElementById('analyticsSection');
@@ -24,6 +33,158 @@ document.addEventListener('DOMContentLoaded', function() {
     
     const languageList = document.getElementById('languageList');
     const leaderboardBody = document.getElementById('leaderboardBody');
+    
+    // Canvas network
+    const bgCanvas = document.getElementById('bgCanvas');
+    let ctx, particles = [], animationId = null;
+    let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    
+    function initCanvas() {
+        if (!bgCanvas) return;
+        ctx = bgCanvas.getContext('2d');
+        resizeCanvas();
+        createParticles();
+        if (!prefersReducedMotion) {
+            animateCanvas();
+        }
+    }
+    
+    function resizeCanvas() {
+        if (!bgCanvas) return;
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+    }
+    
+    function createParticles() {
+        particles = [];
+        const count = Math.min(80, Math.floor((window.innerWidth * window.innerHeight) / 20000));
+        for (let i = 0; i < count; i++) {
+            particles.push({
+                x: Math.random() * bgCanvas.width,
+                y: Math.random() * bgCanvas.height,
+                vx: (Math.random() - 0.5) * 0.3,
+                vy: (Math.random() - 0.5) * 0.3,
+                r: Math.random() * 1.5 + 0.5
+            });
+        }
+    }
+    
+    function animateCanvas() {
+        if (!ctx || prefersReducedMotion) return;
+        ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+        
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            if (p.x < 0 || p.x > bgCanvas.width) p.vx *= -1;
+            if (p.y < 0 || p.y > bgCanvas.height) p.vy *= -1;
+            
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(133, 134, 91, 0.4)';
+            ctx.fill();
+        }
+        
+        // Draw connections
+        for (let i = 0; i < particles.length; i++) {
+            for (let j = i + 1; j < particles.length; j++) {
+                const dx = particles[i].x - particles[j].x;
+                const dy = particles[i].y - particles[j].y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 120) {
+                    ctx.beginPath();
+                    ctx.moveTo(particles[i].x, particles[i].y);
+                    ctx.lineTo(particles[j].x, particles[j].y);
+                    ctx.strokeStyle = `rgba(198, 93, 59, ${0.12 * (1 - dist/120)})`;
+                    ctx.lineWidth = 0.5;
+                    ctx.stroke();
+                }
+            }
+        }
+        
+        // Pointer influence
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            const dx = p.x - pointer.x;
+            const dy = p.y - pointer.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 150) {
+                p.vx += (dx / dist) * 0.01;
+                p.vy += (dy / dist) * 0.01;
+            }
+        }
+        
+        animationId = requestAnimationFrame(animateCanvas);
+    }
+    
+    function triggerCanvasRipple() {
+        if (prefersReducedMotion) return;
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            const dx = p.x - pointer.x;
+            const dy = p.y - pointer.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 200) {
+                p.vx += (Math.random() - 0.5) * 0.5;
+                p.vy += (Math.random() - 0.5) * 0.5;
+            }
+        }
+    }
+    
+    if (!isTouch) {
+        window.addEventListener('mousemove', function(e) {
+            pointer.x = e.clientX;
+            pointer.y = e.clientY;
+        });
+    }
+    
+    window.addEventListener('resize', function() {
+        resizeCanvas();
+        createParticles();
+    });
+    
+    initCanvas();
+    
+    // Cinematic intro
+    if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+        const tl = gsap.timeline({ defaults: { ease: 'power2.out' } });
+        tl.from('[data-anim="nav"]', { y: -20, opacity: 0, duration: 0.6 })
+          .from('.kicker-text', { y: 20, opacity: 0, duration: 0.5 }, '-=0.3')
+          .from('.headline-line', { y: '100%', opacity: 0, duration: 0.8, stagger: 0.15 }, '-=0.2')
+          .from('[data-anim="subtitle"]', { y: 30, opacity: 0, duration: 0.7 }, '-=0.3')
+          .from('[data-anim="search"]', { y: 40, opacity: 0, duration: 0.7 }, '-=0.3')
+          .from('.hero-geo', { scale: 0.8, opacity: 0, duration: 0.8 }, '-=0.5');
+    }
+    
+    // Magnetic button
+    if (searchButton && !isTouch && !prefersReducedMotion) {
+        searchButton.addEventListener('mousemove', function(e) {
+            const rect = searchButton.getBoundingClientRect();
+            const x = e.clientX - rect.left - rect.width / 2;
+            const y = e.clientY - rect.top - rect.height / 2;
+            gsap.to(searchButton, { x: x * 0.3, y: y * 0.3, duration: 0.3, ease: 'power2.out' });
+        });
+        searchButton.addEventListener('mouseleave', function() {
+            gsap.to(searchButton, { x: 0, y: 0, duration: 0.4, ease: 'elastic.out(1, 0.5)' });
+        });
+    }
+    
+    // Scroll triggers
+    if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !prefersReducedMotion) {
+        gsap.utils.toArray('[data-anim="stats"], [data-anim="langs"], [data-anim="repos"], [data-anim="story"]').forEach(section => {
+            gsap.from(section, {
+                y: 60,
+                opacity: 0,
+                duration: 0.8,
+                ease: 'power2.out',
+                scrollTrigger: {
+                    trigger: section,
+                    start: 'top 80%'
+                }
+            });
+        });
+    }
     
     function clearStatus() {
         if (statusRegion) {
@@ -45,6 +206,9 @@ document.addEventListener('DOMContentLoaded', function() {
         }
         msg.textContent = message;
         statusRegion.appendChild(msg);
+        if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+            gsap.from(msg, { y: 10, opacity: 0, duration: 0.4 });
+        }
     }
     
     function hideAllSections() {
@@ -62,13 +226,36 @@ document.addEventListener('DOMContentLoaded', function() {
         if (profileBio) profileBio.textContent = '';
         if (profileLocation) profileLocation.textContent = '';
         
-        if (statRepos) statRepos.textContent = '—';
-        if (statStars) statStars.textContent = '—';
-        if (statFollowers) statFollowers.textContent = '—';
-        if (statFollowing) statFollowing.textContent = '—';
+        if (statRepos) { statRepos.textContent = '—'; statRepos.dataset.counter = '0'; }
+        if (statStars) { statStars.textContent = '—'; statStars.dataset.counter = '0'; }
+        if (statFollowers) { statFollowers.textContent = '—'; statFollowers.dataset.counter = '0'; }
+        if (statFollowing) { statFollowing.textContent = '—'; statFollowing.dataset.counter = '0'; }
         
         if (languageList) languageList.innerHTML = '';
         if (leaderboardBody) leaderboardBody.innerHTML = '';
+    }
+    
+    function animateCounter(element, target) {
+        if (!element || prefersReducedMotion) {
+            if (element) element.textContent = target.toLocaleString();
+            return;
+        }
+        if (typeof gsap === 'undefined') {
+            element.textContent = target.toLocaleString();
+            return;
+        }
+        const obj = { val: 0 };
+        gsap.to(obj, {
+            val: target,
+            duration: 1.2,
+            ease: 'power2.out',
+            onUpdate: function() {
+                element.textContent = Math.floor(obj.val).toLocaleString();
+            },
+            onComplete: function() {
+                element.textContent = target.toLocaleString();
+            }
+        });
     }
     
     if (searchForm) {
@@ -80,7 +267,6 @@ document.addEventListener('DOMContentLoaded', function() {
             hideAllSections();
             resetDisplays();
             
-            // Validation
             if (!username) {
                 showStatus('Please enter a GitHub username.', 'error');
                 if (usernameInput) usernameInput.focus();
@@ -95,13 +281,11 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             showStatus(`Loading profile and repositories for ${username}…`, 'loading');
+            triggerCanvasRipple();
             
             try {
-                // Fetch user profile
                 const userResponse = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
-                    headers: {
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
+                    headers: { 'Accept': 'application/vnd.github.v3+json' }
                 });
                 
                 if (userResponse.status === 404) {
@@ -110,7 +294,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
                 
                 if (userResponse.status === 403) {
-                    // Check rate limit
                     const reset = userResponse.headers.get('X-RateLimit-Reset');
                     if (reset) {
                         const resetDate = new Date(parseInt(reset) * 1000);
@@ -128,11 +311,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const userData = await userResponse.json();
                 
-                // Fetch repositories
                 const reposResponse = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=100&sort=updated`, {
-                    headers: {
-                        'Accept': 'application/vnd.github.v3+json'
-                    }
+                    headers: { 'Accept': 'application/vnd.github.v3+json' }
                 });
                 
                 if (reposResponse.status === 403) {
@@ -153,7 +333,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 const repos = await reposResponse.json();
                 
-                // Calculate totals
                 let totalStars = 0;
                 let totalForks = 0;
                 const languageCounts = {};
@@ -167,8 +346,19 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                // Populate profile
-                if (profileSection) profileSection.style.display = 'block';
+                // Profile transition
+                if (profileSection) {
+                    profileSection.style.display = 'block';
+                    if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+                        gsap.fromTo(profileSection, { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.7, ease: 'power2.out' });
+                        if (profileAvatar) gsap.from(profileAvatar, { scale: 0.8, opacity: 0, duration: 0.6, delay: 0.1 });
+                        if (profileName) gsap.from(profileName, { y: 20, opacity: 0, duration: 0.5, delay: 0.15 });
+                        if (profileLogin) gsap.from(profileLogin, { y: 20, opacity: 0, duration: 0.5, delay: 0.2 });
+                        if (profileBio) gsap.from(profileBio, { y: 20, opacity: 0, duration: 0.5, delay: 0.25 });
+                        if (profileLocation) gsap.from(profileLocation, { y: 20, opacity: 0, duration: 0.5, delay: 0.3 });
+                    }
+                }
+                
                 if (profileAvatar) {
                     profileAvatar.src = userData.avatar_url || '';
                     profileAvatar.alt = `${userData.login} avatar`;
@@ -198,49 +388,81 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                // Populate stats
-                if (analyticsSection) analyticsSection.style.display = 'block';
-                if (statRepos) statRepos.textContent = (userData.public_repos !== undefined && userData.public_repos !== null) ? userData.public_repos.toLocaleString() : '—';
-                if (statStars) statStars.textContent = totalStars.toLocaleString();
-                if (statFollowers) statFollowers.textContent = (userData.followers !== undefined && userData.followers !== null) ? userData.followers.toLocaleString() : '—';
-                if (statFollowing) statFollowing.textContent = (userData.following !== undefined && userData.following !== null) ? userData.following.toLocaleString() : '—';
+                // Stats
+                if (analyticsSection) {
+                    analyticsSection.style.display = 'block';
+                    if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+                        gsap.from(analyticsSection, { y: 40, opacity: 0, duration: 0.7, ease: 'power2.out' });
+                        gsap.from('.stat-card', { y: 30, opacity: 0, duration: 0.6, stagger: 0.1, delay: 0.1 });
+                    }
+                }
                 
-                // Populate languages
+                const repoCount = (userData.public_repos !== undefined && userData.public_repos !== null) ? userData.public_repos : 0;
+                const followersCount = (userData.followers !== undefined && userData.followers !== null) ? userData.followers : 0;
+                const followingCount = (userData.following !== undefined && userData.following !== null) ? userData.following : 0;
+                
+                if (statRepos) { statRepos.dataset.counter = repoCount; animateCounter(statRepos, repoCount); }
+                if (statStars) { statStars.dataset.counter = totalStars; animateCounter(statStars, totalStars); }
+                if (statFollowers) { statFollowers.dataset.counter = followersCount; animateCounter(statFollowers, followersCount); }
+                if (statFollowing) { statFollowing.dataset.counter = followingCount; animateCounter(statFollowing, followingCount); }
+                
+                // Languages
                 if (languageSection) {
-                    if (Object.keys(languageCounts).length > 0) {
-                        languageSection.style.display = 'block';
-                        if (languageList) {
-                            languageList.innerHTML = '';
+                    languageSection.style.display = 'block';
+                    if (languageList) {
+                        languageList.innerHTML = '';
+                        if (Object.keys(languageCounts).length > 0) {
                             const sortedLangs = Object.entries(languageCounts).sort((a, b) => b[1] - a[1]);
+                            const maxCount = sortedLangs[0][1];
                             for (let i = 0; i < sortedLangs.length; i++) {
                                 const [lang, count] = sortedLangs[i];
                                 const item = document.createElement('div');
                                 item.className = 'language-item';
+                                item.style.opacity = '0';
+                                item.style.transform = 'translateX(-20px)';
+                                
                                 const nameSpan = document.createElement('span');
                                 nameSpan.className = 'language-name';
                                 nameSpan.textContent = lang;
+                                
                                 const countSpan = document.createElement('span');
                                 countSpan.className = 'language-count';
                                 countSpan.textContent = count + (count === 1 ? ' repo' : ' repos');
+                                
                                 item.appendChild(nameSpan);
                                 item.appendChild(countSpan);
                                 languageList.appendChild(item);
+                                
+                                if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+                                    gsap.to(item, {
+                                        x: 0,
+                                        opacity: 1,
+                                        duration: 0.5,
+                                        delay: 0.1 + i * 0.05,
+                                        ease: 'power2.out'
+                                    });
+                                } else {
+                                    item.style.opacity = '1';
+                                    item.style.transform = 'translateX(0)';
+                                }
                             }
-                        }
-                    } else {
-                        languageSection.style.display = 'block';
-                        if (languageList) {
-                            languageList.innerHTML = '';
+                        } else {
                             const msg = document.createElement('div');
                             msg.style.color = 'var(--accent-secondary)';
                             msg.style.fontSize = '0.875rem';
                             msg.textContent = 'No primary languages recorded across repositories.';
                             languageList.appendChild(msg);
+                            if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+                                gsap.from(msg, { y: 10, opacity: 0, duration: 0.4 });
+                            }
                         }
+                    }
+                    if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+                        gsap.from(languageSection, { y: 40, opacity: 0, duration: 0.7, ease: 'power2.out' });
                     }
                 }
                 
-                // Populate leaderboard
+                // Leaderboard
                 if (leaderboardSection) {
                     leaderboardSection.style.display = 'block';
                     if (leaderboardBody) {
@@ -261,10 +483,15 @@ document.addEventListener('DOMContentLoaded', function() {
                             td.textContent = 'No public repositories found.';
                             tr.appendChild(td);
                             leaderboardBody.appendChild(tr);
+                            if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+                                gsap.from(tr, { y: 10, opacity: 0, duration: 0.4 });
+                            }
                         } else {
                             for (let i = 0; i < sortedRepos.length && i < 100; i++) {
                                 const repo = sortedRepos[i];
                                 const tr = document.createElement('tr');
+                                tr.style.opacity = '0';
+                                tr.style.transform = 'translateY(20px)';
                                 
                                 const tdName = document.createElement('td');
                                 const nameDiv = document.createElement('div');
@@ -276,8 +503,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                 link.textContent = repo.name;
                                 link.style.color = 'var(--text)';
                                 link.style.textDecoration = 'none';
-                                link.addEventListener('mouseenter', function() { this.style.textDecoration = 'underline'; });
-                                link.addEventListener('mouseleave', function() { this.style.textDecoration = 'none'; });
                                 nameDiv.appendChild(link);
                                 tdName.appendChild(nameDiv);
                                 
@@ -304,8 +529,24 @@ document.addEventListener('DOMContentLoaded', function() {
                                 tr.appendChild(tdStars);
                                 tr.appendChild(tdForks);
                                 leaderboardBody.appendChild(tr);
+                                
+                                if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+                                    gsap.to(tr, {
+                                        y: 0,
+                                        opacity: 1,
+                                        duration: 0.5,
+                                        delay: 0.05 + i * 0.03,
+                                        ease: 'power2.out'
+                                    });
+                                } else {
+                                    tr.style.opacity = '1';
+                                    tr.style.transform = 'translateY(0)';
+                                }
                             }
                         }
+                    }
+                    if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+                        gsap.from(leaderboardSection, { y: 40, opacity: 0, duration: 0.7, ease: 'power2.out' });
                     }
                 }
                 
@@ -316,6 +557,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 successMsg.textContent = `Loaded data for ${userData.login}.`;
                 if (statusRegion) {
                     statusRegion.appendChild(successMsg);
+                    if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+                        gsap.from(successMsg, { y: 10, opacity: 0, duration: 0.4 });
+                    }
                 }
                 
             } catch (error) {
@@ -324,5 +568,13 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Focus styles handled by CSS
+    // Cleanup
+    window.addEventListener('beforeunload', function() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+        }
+        if (typeof ScrollTrigger !== 'undefined') {
+            ScrollTrigger.getAll().forEach(st => st.kill());
+        }
+    });
 });
