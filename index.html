@@ -85,60 +85,52 @@
             </div>
         </section>
 
-        <section class="analytics-overview" aria-labelledby="overview-title">
+        <section id="analyticsSection" class="analytics-overview" aria-labelledby="overview-title" style="display:none;">
             <div class="section-header">
                 <div class="section-kicker">Overview</div>
                 <h2 id="overview-title" class="section-title">Four-statistic analytics</h2>
-                <p class="section-description">Key metrics at a glance. Placeholders until live GitHub data is loaded.</p>
+                <p class="section-description">Key metrics at a glance.</p>
             </div>
             <div class="stats-grid">
                 <article class="stat-card" aria-labelledby="stat-repos-title">
                     <div class="stat-header">
                         <span class="stat-label">Public repositories</span>
-                        <span class="stat-accent" aria-hidden="true">—</span>
+                        <span class="stat-accent" aria-hidden="true">◼</span>
                     </div>
                     <div id="stat-repos-title" class="stat-value" aria-live="polite">—</div>
-                    <div class="stat-footnote">Placeholder</div>
                 </article>
                 <article class="stat-card" aria-labelledby="stat-stars-title">
                     <div class="stat-header">
                         <span class="stat-label">Total stars received</span>
-                        <span class="stat-accent stat-accent-secondary" aria-hidden="true">—</span>
+                        <span class="stat-accent stat-accent-secondary" aria-hidden="true">◼</span>
                     </div>
                     <div id="stat-stars-title" class="stat-value" aria-live="polite">—</div>
-                    <div class="stat-footnote">Placeholder</div>
                 </article>
                 <article class="stat-card" aria-labelledby="stat-followers-title">
                     <div class="stat-header">
                         <span class="stat-label">Followers</span>
-                        <span class="stat-accent" aria-hidden="true">—</span>
+                        <span class="stat-accent" aria-hidden="true">◼</span>
                     </div>
                     <div id="stat-followers-title" class="stat-value" aria-live="polite">—</div>
-                    <div class="stat-footnote">Placeholder</div>
                 </article>
                 <article class="stat-card" aria-labelledby="stat-following-title">
                     <div class="stat-header">
                         <span class="stat-label">Following</span>
-                        <span class="stat-accent stat-accent-secondary" aria-hidden="true">—</span>
+                        <span class="stat-accent stat-accent-secondary" aria-hidden="true">◼</span>
                     </div>
                     <div id="stat-following-title" class="stat-value" aria-live="polite">—</div>
-                    <div class="stat-footnote">Placeholder</div>
                 </article>
             </div>
         </section>
 
-        <section class="language-section" aria-labelledby="lang-title">
+        <section id="languageSection" class="language-section" aria-labelledby="lang-title" style="display:none;">
             <div class="section-header">
                 <div class="section-kicker">Distribution</div>
                 <h2 id="lang-title" class="section-title">Programming language distribution</h2>
-                <p class="section-description">Visual breakdown of languages across repositories. Chart area reserved for future rendering.</p>
+                <p class="section-description">Aggregated by repository primary language.</p>
             </div>
-            <div class="chart-panel" role="region" aria-label="Language distribution chart placeholder">
-                <div class="chart-placeholder" aria-live="polite">
-                    <div class="placeholder-mark" aria-hidden="true">▦</div>
-                    <div class="placeholder-text">Language distribution chart</div>
-                    <div class="placeholder-subtext">Not implemented — awaiting GitHub API integration</div>
-                </div>
+            <div class="chart-panel" role="region" aria-label="Language distribution">
+                <div id="languageList" class="language-list" aria-live="polite"></div>
             </div>
         </section>
 
