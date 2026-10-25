@@ -94,11 +94,12 @@ document.addEventListener('DOMContentLoaded', function() {
     function initKineticTypography() {
         if (typeof gsap === 'undefined') return;
         kineticLines.forEach((line, idx) => {
-            gsap.set(line, { x: idx % 2 === 0 ? -window.innerWidth * 0.3 : window.innerWidth * 0.3, opacity: 0 });
+            gsap.killTweensOf(line);
+            gsap.set(line, { x: idx === 0 ? -window.innerWidth * 0.4 : idx === 1 ? window.innerWidth * 0.4 : -window.innerWidth * 0.5, opacity: 0 });
             gsap.to(line, {
-                x: idx % 2 === 0 ? window.innerWidth * 0.2 : -window.innerWidth * 0.2,
-                opacity: 0.14,
-                duration: 40 + idx * 15,
+                x: idx === 0 ? window.innerWidth * 0.3 : idx === 1 ? -window.innerWidth * 0.3 : window.innerWidth * 0.2,
+                opacity: 0.16,
+                duration: 50 + idx * 18,
                 repeat: -1,
                 ease: 'none'
             });

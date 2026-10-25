@@ -63,33 +63,33 @@ body {
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: -0.02em;
-    color: rgba(32, 32, 30, 0.08);
 }
 
 .kinetic-line {
     position: absolute;
-    font-size: clamp(6rem, 18vw, 14rem);
+    font-size: clamp(7rem, 22vw, 18rem);
     white-space: nowrap;
-    line-height: 0.9;
+    line-height: 0.85;
+    user-select: none;
 }
 
 .kinetic-line-1 {
-    top: 10%;
-    left: -20%;
-    -webkit-text-stroke: 1px rgba(32, 32, 30, 0.12);
+    top: 8%;
+    left: 0;
+    -webkit-text-stroke: 1.5px rgba(32, 32, 30, 0.14);
     color: transparent;
 }
 
 .kinetic-line-2 {
-    top: 40%;
-    right: -30%;
-    color: rgba(32, 32, 30, 0.06);
+    top: 38%;
+    left: 0;
+    color: rgba(32, 32, 30, 0.07);
 }
 
 .kinetic-line-3 {
-    bottom: 15%;
-    left: -40%;
-    -webkit-text-stroke: 1px rgba(198, 93, 59, 0.15);
+    bottom: 12%;
+    left: 0;
+    -webkit-text-stroke: 1.5px rgba(198, 93, 59, 0.18);
     color: transparent;
 }
 
