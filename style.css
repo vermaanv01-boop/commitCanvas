@@ -196,6 +196,7 @@ body {
 
 /* Sections */
 .search-section,
+.profile-section,
 .analytics-overview,
 .language-section,
 .heatmap-section,
@@ -203,6 +204,99 @@ body {
 .activity-section {
     padding: 3rem 0;
     border-bottom: 1px solid var(--border);
+}
+
+/* Profile */
+.profile-card {
+    border: 1px solid var(--border);
+    background: var(--surface);
+    padding: 1.75rem;
+}
+
+.profile-header {
+    display: flex;
+    gap: 1.25rem;
+    align-items: flex-start;
+    flex-wrap: wrap;
+}
+
+.profile-avatar {
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    border: 1px solid var(--border);
+    object-fit: cover;
+    background: rgba(218, 215, 208, 0.3);
+}
+
+.profile-info {
+    flex: 1;
+    min-width: 250px;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.profile-name-row {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.75rem;
+}
+
+.profile-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: var(--text);
+}
+
+.profile-login {
+    font-size: 1rem;
+    color: var(--accent-secondary);
+}
+
+.profile-bio {
+    font-size: 0.9375rem;
+    color: var(--text);
+    line-height: 1.7;
+}
+
+.profile-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem 1rem;
+    font-size: 0.875rem;
+    color: var(--accent-secondary);
+}
+
+/* Language list */
+.language-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    width: 100%;
+}
+
+.language-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.875rem 1rem;
+    border: 1px solid var(--border);
+    background: rgba(247, 245, 240, 0.6);
+}
+
+.language-name {
+    font-family: 'Space Grotesk', sans-serif;
+    font-weight: 500;
+    color: var(--text);
+}
+
+.language-count {
+    font-variant-numeric: tabular-nums;
+    color: var(--accent-secondary);
 }
 
 /* Search form */
