@@ -952,7 +952,20 @@ body {
 }
 
 /* Responsive */
+@media (min-width: 1024px) {
+    .hero-geo {
+        display: block;
+    }
+    .story-geo {
+        display: block;
+    }
+}
+
 @media (max-width: 768px) {
+    .bg-canvas {
+        opacity: 0.25;
+    }
+    
     .nav-container {
         padding: 1rem 1.25rem;
         flex-direction: column;
@@ -965,7 +978,7 @@ body {
     }
     
     .hero {
-        padding: 3rem 0 2.5rem;
+        padding: 3.5rem 0 3rem;
     }
     
     .search-section,
@@ -974,8 +987,9 @@ body {
     .language-section,
     .heatmap-section,
     .leaderboard-section,
-    .activity-section {
-        padding: 2.5rem 0;
+    .activity-section,
+    .story-section {
+        padding: 2.75rem 0;
     }
     
     .profile-card {
