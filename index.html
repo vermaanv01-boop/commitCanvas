@@ -39,7 +39,7 @@
             <div class="section-header">
                 <div class="section-kicker">Analysis</div>
                 <h2 id="search-title" class="section-title">Profile lookup</h2>
-                <p class="section-description">Enter a GitHub username to explore analytics. Integration pending—inputs are prepared for future API calls.</p>
+                <p class="section-description">Enter a GitHub username to explore analytics using the public GitHub REST API.</p>
             </div>
             <form id="githubSearchForm" class="search-form" novalidate aria-label="GitHub username search">
                 <div class="form-row">
@@ -57,10 +57,32 @@
                         >
                         <button type="submit" class="search-button">Analyze profile</button>
                     </div>
-                    <small id="usernameHelp" class="form-help">No data fetched yet. This form is for layout and accessibility.</small>
+                    <small id="usernameHelp" class="form-help">Fetches public profile and repositories via GitHub API.</small>
                 </div>
             </form>
             <div id="searchStatus" class="status-region" aria-live="polite" aria-atomic="true"></div>
+        </section>
+
+        <section id="profileSection" class="profile-section" aria-labelledby="profile-title" style="display:none;">
+            <div class="section-header">
+                <div class="section-kicker">Profile</div>
+                <h2 id="profile-title" class="section-title">GitHub profile</h2>
+            </div>
+            <div class="profile-card">
+                <div class="profile-header">
+                    <img id="profileAvatar" class="profile-avatar" src="" alt="User avatar" />
+                    <div class="profile-info">
+                        <div class="profile-name-row">
+                            <h3 id="profileName" class="profile-name"></h3>
+                            <span id="profileLogin" class="profile-login"></span>
+                        </div>
+                        <p id="profileBio" class="profile-bio"></p>
+                        <div class="profile-meta">
+                            <span id="profileLocation" class="profile-meta-item"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section class="analytics-overview" aria-labelledby="overview-title">
