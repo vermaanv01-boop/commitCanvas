@@ -415,6 +415,29 @@ body {
     padding: 0.875rem 1rem;
     border: 1px solid var(--border);
     background: rgba(247, 245, 240, 0.6);
+    position: relative;
+    overflow: hidden;
+}
+
+.language-item::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 0;
+    background: rgba(198, 93, 59, 0.08);
+    transition: width 0.4s ease;
+}
+
+.language-item:hover::before {
+    width: 100%;
+}
+
+.language-name,
+.language-count {
+    position: relative;
+    z-index: 1;
 }
 
 .language-name {
