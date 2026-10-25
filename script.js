@@ -1,15 +1,13 @@
-// CommitCanvas - Motion-rich GitHub API integration with GSAP 3
+// CommitCanvas - Animated background with grid, particles, geometric outlines
 
 document.addEventListener('DOMContentLoaded', function() {
     const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     const isTouch = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
     
-    // GSAP setup
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined') {
         gsap.registerPlugin(ScrollTrigger);
     }
     
-    // Elements
     const searchForm = document.getElementById('githubSearchForm');
     const usernameInput = document.getElementById('githubUsername');
     const statusRegion = document.getElementById('searchStatus');
@@ -34,100 +32,185 @@ document.addEventListener('DOMContentLoaded', function() {
     const languageList = document.getElementById('languageList');
     const leaderboardBody = document.getElementById('leaderboardBody');
     
-    // Canvas network
+    // Animated background
     const bgCanvas = document.getElementById('bgCanvas');
-    let ctx, particles = [], animationId = null;
+    let ctx = null;
+    let dpr = Math.min(window.devicePixelRatio || 1, 2);
+    let particles = [];
+    let outlines = [];
+    let animationId = null;
     let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
+    let isVisible = document.visibilityState === 'visible';
     
-    function initCanvas() {
+    function initBackground() {
         if (!bgCanvas) return;
         ctx = bgCanvas.getContext('2d');
-        resizeCanvas();
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        resizeBackground();
         createParticles();
+        createOutlines();
         if (!prefersReducedMotion) {
-            animateCanvas();
+            startAnimation();
         }
     }
     
-    function resizeCanvas() {
+    function resizeBackground() {
         if (!bgCanvas) return;
-        bgCanvas.width = window.innerWidth;
-        bgCanvas.height = window.innerHeight;
+        bgCanvas.width = Math.floor(window.innerWidth * dpr);
+        bgCanvas.height = Math.floor(window.innerHeight * dpr);
+        bgCanvas.style.width = window.innerWidth + 'px';
+        bgCanvas.style.height = window.innerHeight + 'px';
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     
     function createParticles() {
         particles = [];
-        const count = Math.min(80, Math.floor((window.innerWidth * window.innerHeight) / 20000));
+        const count = 35 + Math.floor(Math.random() * 21); // 35-55
         for (let i = 0; i < count; i++) {
             particles.push({
-                x: Math.random() * bgCanvas.width,
-                y: Math.random() * bgCanvas.height,
-                vx: (Math.random() - 0.5) * 0.3,
-                vy: (Math.random() - 0.5) * 0.3,
-                r: Math.random() * 1.5 + 0.5
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                vx: (Math.random() - 0.5) * 0.25,
+                vy: (Math.random() - 0.5) * 0.25,
+                r: Math.random() * 1.4 + 0.6,
+                accent: Math.random() < 0.18,
+                phase: Math.random() * Math.PI * 2
             });
         }
     }
     
-    function animateCanvas() {
-        if (!ctx || prefersReducedMotion) return;
-        ctx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+    function createOutlines() {
+        outlines = [];
+        for (let i = 0; i < 3; i++) {
+            outlines.push({
+                x: Math.random() * window.innerWidth,
+                y: Math.random() * window.innerHeight,
+                vx: (Math.random() - 0.5) * 0.12,
+                vy: (Math.random() - 0.5) * 0.12,
+                rot: Math.random() * Math.PI,
+                rotSpeed: (Math.random() - 0.5) * 0.0008,
+                size: 80 + Math.random() * 60
+            });
+        }
+    }
+    
+    function drawBackground() {
+        if (!ctx || prefersReducedMotion || !isVisible) return;
         
+        ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+        
+        // Grid
+        ctx.save();
+        ctx.strokeStyle = 'rgba(218, 215, 208, 0.4)';
+        ctx.lineWidth = 0.5;
+        const gridSize = 40;
+        for (let x = 0; x < window.innerWidth; x += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, window.innerHeight);
+            ctx.stroke();
+        }
+        for (let y = 0; y < window.innerHeight; y += gridSize) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(window.innerWidth, y);
+            ctx.stroke();
+        }
+        ctx.restore();
+        
+        // Outlines
+        ctx.save();
+        ctx.strokeStyle = 'rgba(133, 134, 91, 0.25)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < outlines.length; i++) {
+            const o = outlines[i];
+            o.x += o.vx;
+            o.y += o.vy;
+            o.rot += o.rotSpeed;
+            if (o.x < -50) o.x = window.innerWidth + 50;
+            if (o.x > window.innerWidth + 50) o.x = -50;
+            if (o.y < -50) o.y = window.innerHeight + 50;
+            if (o.y > window.innerHeight + 50) o.y = -50;
+            ctx.save();
+            ctx.translate(o.x, o.y);
+            ctx.rotate(o.rot);
+            ctx.strokeRect(-o.size / 2, -o.size / 2, o.size, o.size);
+            ctx.restore();
+        }
+        ctx.restore();
+        
+        // Particles
         for (let i = 0; i < particles.length; i++) {
             const p = particles[i];
             p.x += p.vx;
             p.y += p.vy;
-            if (p.x < 0 || p.x > bgCanvas.width) p.vx *= -1;
-            if (p.y < 0 || p.y > bgCanvas.height) p.vy *= -1;
+            if (p.x < 0) p.x = window.innerWidth;
+            if (p.x > window.innerWidth) p.x = 0;
+            if (p.y < 0) p.y = window.innerHeight;
+            if (p.y > window.innerHeight) p.y = 0;
+            
+            if (!isTouch) {
+                const dx = p.x - pointer.x;
+                const dy = p.y - pointer.y;
+                const dist = Math.sqrt(dx * dx + dy * dy);
+                if (dist < 140) {
+                    p.vx += (dx / dist) * 0.008;
+                    p.vy += (dy / dist) * 0.008;
+                }
+            }
             
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
-            ctx.fillStyle = 'rgba(133, 134, 91, 0.4)';
+            if (p.accent) {
+                ctx.fillStyle = 'rgba(198, 93, 59, 0.5)';
+            } else {
+                ctx.fillStyle = 'rgba(133, 134, 91, 0.45)';
+            }
             ctx.fill();
         }
         
-        // Draw connections
+        // Connections
         for (let i = 0; i < particles.length; i++) {
             for (let j = i + 1; j < particles.length; j++) {
                 const dx = particles[i].x - particles[j].x;
                 const dy = particles[i].y - particles[j].y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 120) {
+                if (dist < 110) {
                     ctx.beginPath();
                     ctx.moveTo(particles[i].x, particles[i].y);
                     ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.strokeStyle = `rgba(198, 93, 59, ${0.12 * (1 - dist/120)})`;
-                    ctx.lineWidth = 0.5;
+                    ctx.strokeStyle = `rgba(198, 93, 59, ${0.1 * (1 - dist / 110)})`;
+                    ctx.lineWidth = 0.4;
                     ctx.stroke();
                 }
             }
         }
         
-        // Pointer influence
-        for (let i = 0; i < particles.length; i++) {
-            const p = particles[i];
-            const dx = p.x - pointer.x;
-            const dy = p.y - pointer.y;
-            const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 150) {
-                p.vx += (dx / dist) * 0.01;
-                p.vy += (dy / dist) * 0.01;
-            }
-        }
-        
-        animationId = requestAnimationFrame(animateCanvas);
+        animationId = requestAnimationFrame(drawBackground);
     }
     
-    function triggerCanvasRipple() {
+    function startAnimation() {
+        if (animationId) cancelAnimationFrame(animationId);
+        animationId = requestAnimationFrame(drawBackground);
+    }
+    
+    function stopAnimation() {
+        if (animationId) {
+            cancelAnimationFrame(animationId);
+            animationId = null;
+        }
+    }
+    
+    function triggerBackgroundRipple() {
         if (prefersReducedMotion) return;
         for (let i = 0; i < particles.length; i++) {
             const p = particles[i];
             const dx = p.x - pointer.x;
             const dy = p.y - pointer.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 200) {
-                p.vx += (Math.random() - 0.5) * 0.5;
-                p.vy += (Math.random() - 0.5) * 0.5;
+            if (dist < 220) {
+                p.vx += (Math.random() - 0.5) * 0.6;
+                p.vy += (Math.random() - 0.5) * 0.6;
             }
         }
     }
@@ -140,11 +223,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     window.addEventListener('resize', function() {
-        resizeCanvas();
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        resizeBackground();
         createParticles();
+        createOutlines();
     });
     
-    initCanvas();
+    document.addEventListener('visibilitychange', function() {
+        isVisible = document.visibilityState === 'visible';
+        if (isVisible && !prefersReducedMotion && !animationId) {
+            startAnimation();
+        } else if (!isVisible) {
+            stopAnimation();
+        }
+    });
+    
+    initBackground();
     
     // Cinematic intro
     if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
@@ -157,7 +251,6 @@ document.addEventListener('DOMContentLoaded', function() {
           .from('.hero-geo', { scale: 0.8, opacity: 0, duration: 0.8 }, '-=0.5');
     }
     
-    // Magnetic button
     if (searchButton && !isTouch && !prefersReducedMotion) {
         searchButton.addEventListener('mousemove', function(e) {
             const rect = searchButton.getBoundingClientRect();
@@ -170,7 +263,6 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    // Scroll triggers
     if (typeof gsap !== 'undefined' && typeof ScrollTrigger !== 'undefined' && !prefersReducedMotion) {
         gsap.utils.toArray('[data-anim="stats"], [data-anim="langs"], [data-anim="repos"], [data-anim="story"]').forEach(section => {
             gsap.from(section, {
@@ -187,9 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function clearStatus() {
-        if (statusRegion) {
-            statusRegion.innerHTML = '';
-        }
+        if (statusRegion) statusRegion.innerHTML = '';
     }
     
     function showStatus(message, type) {
@@ -197,13 +287,9 @@ document.addEventListener('DOMContentLoaded', function() {
         if (!statusRegion) return;
         const msg = document.createElement('div');
         msg.style.fontSize = '0.875rem';
-        if (type === 'error') {
-            msg.style.color = 'var(--accent)';
-        } else if (type === 'loading') {
-            msg.style.color = 'var(--accent-secondary)';
-        } else {
-            msg.style.color = 'var(--text)';
-        }
+        if (type === 'error') msg.style.color = 'var(--accent)';
+        else if (type === 'loading') msg.style.color = 'var(--accent-secondary)';
+        else msg.style.color = 'var(--text)';
         msg.textContent = message;
         statusRegion.appendChild(msg);
         if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
@@ -219,18 +305,15 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     function resetDisplays() {
-        if (profileAvatar) profileAvatar.src = '';
-        if (profileAvatar) profileAvatar.alt = 'User avatar';
+        if (profileAvatar) { profileAvatar.src = ''; profileAvatar.alt = 'User avatar'; }
         if (profileName) profileName.textContent = '';
         if (profileLogin) profileLogin.textContent = '';
         if (profileBio) profileBio.textContent = '';
         if (profileLocation) profileLocation.textContent = '';
-        
         if (statRepos) { statRepos.textContent = '—'; statRepos.dataset.counter = '0'; }
         if (statStars) { statStars.textContent = '—'; statStars.dataset.counter = '0'; }
         if (statFollowers) { statFollowers.textContent = '—'; statFollowers.dataset.counter = '0'; }
         if (statFollowing) { statFollowing.textContent = '—'; statFollowing.dataset.counter = '0'; }
-        
         if (languageList) languageList.innerHTML = '';
         if (leaderboardBody) leaderboardBody.innerHTML = '';
     }
@@ -249,19 +332,14 @@ document.addEventListener('DOMContentLoaded', function() {
             val: target,
             duration: 1.2,
             ease: 'power2.out',
-            onUpdate: function() {
-                element.textContent = Math.floor(obj.val).toLocaleString();
-            },
-            onComplete: function() {
-                element.textContent = target.toLocaleString();
-            }
+            onUpdate: function() { element.textContent = Math.floor(obj.val).toLocaleString(); },
+            onComplete: function() { element.textContent = target.toLocaleString(); }
         });
     }
     
     if (searchForm) {
         searchForm.addEventListener('submit', async function(e) {
             e.preventDefault();
-            
             const username = usernameInput.value.trim();
             clearStatus();
             hideAllSections();
@@ -272,7 +350,6 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (usernameInput) usernameInput.focus();
                 return;
             }
-            
             const usernameRegex = /^[a-zA-Z0-9]([a-zA-Z0-9-]{0,37}[a-zA-Z0-9])?$/;
             if (!usernameRegex.test(username)) {
                 showStatus('Please enter a valid GitHub username.', 'error');
@@ -281,18 +358,19 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             showStatus(`Loading profile and repositories for ${username}…`, 'loading');
-            triggerCanvasRipple();
+            triggerBackgroundRipple();
+            if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
+                gsap.fromTo(statusRegion, { scale: 0.98 }, { scale: 1, duration: 0.3 });
+            }
             
             try {
                 const userResponse = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}`, {
                     headers: { 'Accept': 'application/vnd.github.v3+json' }
                 });
-                
                 if (userResponse.status === 404) {
                     showStatus('User not found. Please check the username and try again.', 'error');
                     return;
                 }
-                
                 if (userResponse.status === 403) {
                     const reset = userResponse.headers.get('X-RateLimit-Reset');
                     if (reset) {
@@ -303,18 +381,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     return;
                 }
-                
                 if (!userResponse.ok) {
                     showStatus(`Error fetching profile: ${userResponse.status}.`, 'error');
                     return;
                 }
-                
                 const userData = await userResponse.json();
                 
                 const reposResponse = await fetch(`https://api.github.com/users/${encodeURIComponent(username)}/repos?per_page=100&sort=updated`, {
                     headers: { 'Accept': 'application/vnd.github.v3+json' }
                 });
-                
                 if (reposResponse.status === 403) {
                     const reset = reposResponse.headers.get('X-RateLimit-Reset');
                     if (reset) {
@@ -325,18 +400,15 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                     return;
                 }
-                
                 if (!reposResponse.ok) {
                     showStatus(`Error fetching repositories: ${reposResponse.status}.`, 'error');
                     return;
                 }
-                
                 const repos = await reposResponse.json();
                 
                 let totalStars = 0;
                 let totalForks = 0;
                 const languageCounts = {};
-                
                 for (let i = 0; i < repos.length; i++) {
                     const repo = repos[i];
                     totalStars += repo.stargazers_count || 0;
@@ -346,7 +418,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                // Profile transition
                 if (profileSection) {
                     profileSection.style.display = 'block';
                     if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
@@ -359,36 +430,18 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                if (profileAvatar) {
-                    profileAvatar.src = userData.avatar_url || '';
-                    profileAvatar.alt = `${userData.login} avatar`;
-                }
-                if (profileName) {
-                    profileName.textContent = userData.name || userData.login || '';
-                }
-                if (profileLogin) {
-                    profileLogin.textContent = userData.login ? `@${userData.login}` : '';
-                }
+                if (profileAvatar) { profileAvatar.src = userData.avatar_url || ''; profileAvatar.alt = `${userData.login} avatar`; }
+                if (profileName) profileName.textContent = userData.name || userData.login || '';
+                if (profileLogin) profileLogin.textContent = userData.login ? `@${userData.login}` : '';
                 if (profileBio) {
-                    if (userData.bio) {
-                        profileBio.textContent = userData.bio;
-                        profileBio.style.display = 'block';
-                    } else {
-                        profileBio.textContent = 'No bio available.';
-                        profileBio.style.display = 'block';
-                    }
+                    if (userData.bio) { profileBio.textContent = userData.bio; profileBio.style.display = 'block'; }
+                    else { profileBio.textContent = 'No bio available.'; profileBio.style.display = 'block'; }
                 }
                 if (profileLocation) {
-                    if (userData.location) {
-                        profileLocation.textContent = `📍 ${userData.location}`;
-                        profileLocation.style.display = 'inline';
-                    } else {
-                        profileLocation.textContent = 'Location: not specified';
-                        profileLocation.style.display = 'inline';
-                    }
+                    if (userData.location) { profileLocation.textContent = `📍 ${userData.location}`; profileLocation.style.display = 'inline'; }
+                    else { profileLocation.textContent = 'Location: not specified'; profileLocation.style.display = 'inline'; }
                 }
                 
-                // Stats
                 if (analyticsSection) {
                     analyticsSection.style.display = 'block';
                     if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
@@ -406,41 +459,29 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (statFollowers) { statFollowers.dataset.counter = followersCount; animateCounter(statFollowers, followersCount); }
                 if (statFollowing) { statFollowing.dataset.counter = followingCount; animateCounter(statFollowing, followingCount); }
                 
-                // Languages
                 if (languageSection) {
                     languageSection.style.display = 'block';
                     if (languageList) {
                         languageList.innerHTML = '';
                         if (Object.keys(languageCounts).length > 0) {
                             const sortedLangs = Object.entries(languageCounts).sort((a, b) => b[1] - a[1]);
-                            const maxCount = sortedLangs[0][1];
                             for (let i = 0; i < sortedLangs.length; i++) {
                                 const [lang, count] = sortedLangs[i];
                                 const item = document.createElement('div');
                                 item.className = 'language-item';
                                 item.style.opacity = '0';
                                 item.style.transform = 'translateX(-20px)';
-                                
                                 const nameSpan = document.createElement('span');
                                 nameSpan.className = 'language-name';
                                 nameSpan.textContent = lang;
-                                
                                 const countSpan = document.createElement('span');
                                 countSpan.className = 'language-count';
                                 countSpan.textContent = count + (count === 1 ? ' repo' : ' repos');
-                                
                                 item.appendChild(nameSpan);
                                 item.appendChild(countSpan);
                                 languageList.appendChild(item);
-                                
                                 if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
-                                    gsap.to(item, {
-                                        x: 0,
-                                        opacity: 1,
-                                        duration: 0.5,
-                                        delay: 0.1 + i * 0.05,
-                                        ease: 'power2.out'
-                                    });
+                                    gsap.to(item, { x: 0, opacity: 1, duration: 0.5, delay: 0.1 + i * 0.05, ease: 'power2.out' });
                                 } else {
                                     item.style.opacity = '1';
                                     item.style.transform = 'translateX(0)';
@@ -462,7 +503,6 @@ document.addEventListener('DOMContentLoaded', function() {
                     }
                 }
                 
-                // Leaderboard
                 if (leaderboardSection) {
                     leaderboardSection.style.display = 'block';
                     if (leaderboardBody) {
@@ -472,7 +512,6 @@ document.addEventListener('DOMContentLoaded', function() {
                             if (starsDiff !== 0) return starsDiff;
                             return (b.forks_count || 0) - (a.forks_count || 0);
                         });
-                        
                         if (sortedRepos.length === 0) {
                             const tr = document.createElement('tr');
                             const td = document.createElement('td');
@@ -492,7 +531,6 @@ document.addEventListener('DOMContentLoaded', function() {
                                 const tr = document.createElement('tr');
                                 tr.style.opacity = '0';
                                 tr.style.transform = 'translateY(20px)';
-                                
                                 const tdName = document.createElement('td');
                                 const nameDiv = document.createElement('div');
                                 nameDiv.className = 'repo-name';
@@ -505,39 +543,27 @@ document.addEventListener('DOMContentLoaded', function() {
                                 link.style.textDecoration = 'none';
                                 nameDiv.appendChild(link);
                                 tdName.appendChild(nameDiv);
-                                
                                 const tdDesc = document.createElement('td');
                                 const descDiv = document.createElement('div');
                                 descDiv.className = 'repo-desc';
                                 descDiv.textContent = repo.description || '—';
                                 tdDesc.appendChild(descDiv);
-                                
                                 const tdLang = document.createElement('td');
                                 tdLang.textContent = repo.language || '—';
-                                
                                 const tdStars = document.createElement('td');
                                 tdStars.className = 'numeric';
                                 tdStars.textContent = (repo.stargazers_count || 0).toLocaleString();
-                                
                                 const tdForks = document.createElement('td');
                                 tdForks.className = 'numeric';
                                 tdForks.textContent = (repo.forks_count || 0).toLocaleString();
-                                
                                 tr.appendChild(tdName);
                                 tr.appendChild(tdDesc);
                                 tr.appendChild(tdLang);
                                 tr.appendChild(tdStars);
                                 tr.appendChild(tdForks);
                                 leaderboardBody.appendChild(tr);
-                                
                                 if (typeof gsap !== 'undefined' && !prefersReducedMotion) {
-                                    gsap.to(tr, {
-                                        y: 0,
-                                        opacity: 1,
-                                        duration: 0.5,
-                                        delay: 0.05 + i * 0.03,
-                                        ease: 'power2.out'
-                                    });
+                                    gsap.to(tr, { y: 0, opacity: 1, duration: 0.5, delay: 0.05 + i * 0.03, ease: 'power2.out' });
                                 } else {
                                     tr.style.opacity = '1';
                                     tr.style.transform = 'translateY(0)';
@@ -561,18 +587,14 @@ document.addEventListener('DOMContentLoaded', function() {
                         gsap.from(successMsg, { y: 10, opacity: 0, duration: 0.4 });
                     }
                 }
-                
             } catch (error) {
                 showStatus('Network error. Please check your connection and try again.', 'error');
             }
         });
     }
     
-    // Cleanup
     window.addEventListener('beforeunload', function() {
-        if (animationId) {
-            cancelAnimationFrame(animationId);
-        }
+        stopAnimation();
         if (typeof ScrollTrigger !== 'undefined') {
             ScrollTrigger.getAll().forEach(st => st.kill());
         }
