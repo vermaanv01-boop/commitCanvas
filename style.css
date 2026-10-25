@@ -32,6 +32,20 @@ body {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
+    position: relative;
+    overflow-x: hidden;
+}
+
+/* Background canvas */
+.bg-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    pointer-events: none;
+    z-index: 0;
+    opacity: 0.4;
 }
 
 /* Skip link for accessibility */
@@ -53,6 +67,14 @@ body {
     top: 0;
     outline: 2px solid var(--accent);
     outline-offset: 2px;
+}
+
+/* Ensure content sits above canvas */
+.site-header,
+.main,
+.site-footer {
+    position: relative;
+    z-index: 1;
 }
 
 /* Header */
@@ -113,21 +135,25 @@ body {
 
 /* Hero */
 .hero {
-    padding: 4rem 0 3rem;
+    padding: 5rem 0 4rem;
     border-bottom: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
 }
 
 .hero-grid {
     display: grid;
     grid-template-columns: 1fr;
-    gap: 1.5rem;
-    max-width: 900px;
+    gap: 1.75rem;
+    max-width: 1000px;
+    position: relative;
 }
 
 .hero-kicker {
     display: flex;
     align-items: center;
     gap: 0.75rem;
+    overflow: hidden;
 }
 
 .kicker-text {
@@ -136,6 +162,7 @@ body {
     letter-spacing: 0.12em;
     color: var(--accent-secondary);
     font-weight: 500;
+    display: inline-block;
 }
 
 .hero-kicker::before {
@@ -143,23 +170,64 @@ body {
     width: 40px;
     height: 1px;
     background: var(--accent);
+    flex-shrink: 0;
 }
 
 .hero-title {
     font-family: 'Space Grotesk', sans-serif;
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-size: clamp(3rem, 10vw, 6rem);
     font-weight: 700;
-    line-height: 1.05;
-    letter-spacing: -0.03em;
+    line-height: 0.95;
+    letter-spacing: -0.04em;
     color: var(--text);
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.headline-line {
+    display: block;
+    overflow: hidden;
 }
 
 .hero-subtitle {
     font-size: 1.125rem;
     color: var(--text);
-    max-width: 650px;
-    line-height: 1.8;
+    max-width: 680px;
+    line-height: 1.9;
     opacity: 0.9;
+    overflow: hidden;
+}
+
+.hero-geo {
+    position: absolute;
+    right: -60px;
+    top: 20%;
+    width: 200px;
+    height: 200px;
+    pointer-events: none;
+    display: none;
+}
+
+.geo-shape {
+    position: absolute;
+    border: 1px solid var(--border-strong);
+}
+
+.geo-shape-1 {
+    width: 120px;
+    height: 120px;
+    top: 0;
+    right: 0;
+    transform: rotate(12deg);
+}
+
+.geo-shape-2 {
+    width: 80px;
+    height: 80px;
+    bottom: 0;
+    left: 20px;
+    transform: rotate(-18deg);
 }
 
 /* Section headers */

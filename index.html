@@ -29,15 +29,22 @@
     <main id="main" class="main">
         <section class="hero" aria-labelledby="hero-title">
             <div class="hero-grid">
-                <div class="hero-kicker">
+                <div class="hero-kicker" data-anim="kicker">
                     <span class="kicker-text">Editorial data studio</span>
                 </div>
-                <h1 id="hero-title" class="hero-title">Your code. Your story.</h1>
-                <p class="hero-subtitle">A structured view of GitHub activity—languages, contributions, and repositories—presented with the precision of a Swiss grid.</p>
+                <h1 id="hero-title" class="hero-title" data-anim="headline">
+                    <span class="headline-line">Your code.</span>
+                    <span class="headline-line">Your story.</span>
+                </h1>
+                <p class="hero-subtitle" data-anim="subtitle">A structured view of GitHub activity—languages, contributions, and repositories—presented with the precision of a Swiss grid.</p>
+                <div class="hero-geo" aria-hidden="true">
+                    <div class="geo-shape geo-shape-1"></div>
+                    <div class="geo-shape geo-shape-2"></div>
+                </div>
             </div>
         </section>
 
-        <section class="search-section" aria-labelledby="search-title">
+        <section class="search-section" aria-labelledby="search-title" data-anim="search">
             <div class="section-header">
                 <div class="section-kicker">Analysis</div>
                 <h2 id="search-title" class="section-title">Profile lookup</h2>
@@ -57,7 +64,7 @@
                             aria-required="true"
                             aria-describedby="usernameHelp"
                         >
-                        <button type="submit" class="search-button">Analyze profile</button>
+                        <button type="submit" class="search-button magnetic-btn">Analyze profile</button>
                     </div>
                     <small id="usernameHelp" class="form-help">Fetches public profile and repositories via GitHub API.</small>
                 </div>
@@ -65,7 +72,7 @@
             <div id="searchStatus" class="status-region" aria-live="polite" aria-atomic="true"></div>
         </section>
 
-        <section id="profileSection" class="profile-section" aria-labelledby="profile-title" style="display:none;">
+        <section id="profileSection" class="profile-section" aria-labelledby="profile-title" style="display:none;" data-anim="profile">
             <div class="section-header">
                 <div class="section-kicker">Profile</div>
                 <h2 id="profile-title" class="section-title">GitHub profile</h2>
@@ -87,7 +94,7 @@
             </div>
         </section>
 
-        <section id="analyticsSection" class="analytics-overview" aria-labelledby="overview-title" style="display:none;">
+        <section id="analyticsSection" class="analytics-overview" aria-labelledby="overview-title" style="display:none;" data-anim="stats">
             <div class="section-header">
                 <div class="section-kicker">Overview</div>
                 <h2 id="overview-title" class="section-title">Four-statistic analytics</h2>
@@ -99,33 +106,33 @@
                         <span class="stat-label">Public repositories</span>
                         <span class="stat-accent" aria-hidden="true">◼</span>
                     </div>
-                    <div id="stat-repos-title" class="stat-value" aria-live="polite">—</div>
+                    <div id="stat-repos-title" class="stat-value" aria-live="polite" data-counter="0">—</div>
                 </article>
                 <article class="stat-card" aria-labelledby="stat-stars-title">
                     <div class="stat-header">
                         <span class="stat-label">Total stars received</span>
                         <span class="stat-accent stat-accent-secondary" aria-hidden="true">◼</span>
                     </div>
-                    <div id="stat-stars-title" class="stat-value" aria-live="polite">—</div>
+                    <div id="stat-stars-title" class="stat-value" aria-live="polite" data-counter="0">—</div>
                 </article>
                 <article class="stat-card" aria-labelledby="stat-followers-title">
                     <div class="stat-header">
                         <span class="stat-label">Followers</span>
                         <span class="stat-accent" aria-hidden="true">◼</span>
                     </div>
-                    <div id="stat-followers-title" class="stat-value" aria-live="polite">—</div>
+                    <div id="stat-followers-title" class="stat-value" aria-live="polite" data-counter="0">—</div>
                 </article>
                 <article class="stat-card" aria-labelledby="stat-following-title">
                     <div class="stat-header">
                         <span class="stat-label">Following</span>
                         <span class="stat-accent stat-accent-secondary" aria-hidden="true">◼</span>
                     </div>
-                    <div id="stat-following-title" class="stat-value" aria-live="polite">—</div>
+                    <div id="stat-following-title" class="stat-value" aria-live="polite" data-counter="0">—</div>
                 </article>
             </div>
         </section>
 
-        <section id="languageSection" class="language-section" aria-labelledby="lang-title" style="display:none;">
+        <section id="languageSection" class="language-section" aria-labelledby="lang-title" style="display:none;" data-anim="langs">
             <div class="section-header">
                 <div class="section-kicker">Distribution</div>
                 <h2 id="lang-title" class="section-title">Programming language distribution</h2>
@@ -172,7 +179,7 @@
             </div>
         </section>
 
-        <section id="leaderboardSection" class="leaderboard-section" aria-labelledby="leaderboard-title" style="display:none;">
+        <section id="leaderboardSection" class="leaderboard-section" aria-labelledby="leaderboard-title" style="display:none;" data-anim="repos">
             <div class="section-header">
                 <div class="section-kicker">Repositories</div>
                 <h2 id="leaderboard-title" class="section-title">Repository leaderboard</h2>
@@ -217,6 +224,18 @@
         </section>
     </main>
 
+    <section class="story-section" aria-labelledby="story-title" data-anim="story">
+        <div class="story-grid">
+            <div class="story-kicker">Narrative</div>
+            <h2 id="story-title" class="story-title">Code is context.</h2>
+            <p class="story-text">Every commit, language, and repository traces a path. CommitCanvas renders that trajectory with restraint and intent.</p>
+            <div class="story-geo" aria-hidden="true">
+                <div class="story-line"></div>
+                <div class="story-dot"></div>
+            </div>
+        </div>
+    </section>
+
     <footer class="site-footer">
         <div class="footer-container">
             <div class="footer-brand">
@@ -231,6 +250,8 @@
         </div>
     </footer>
 
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/gsap@3/dist/ScrollTrigger.min.js"></script>
     <script src="script.js"></script>
 </body>
 </html>
