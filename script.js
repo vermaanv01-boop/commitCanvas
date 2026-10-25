@@ -32,15 +32,25 @@ document.addEventListener('DOMContentLoaded', function() {
     const languageList = document.getElementById('languageList');
     const leaderboardBody = document.getElementById('leaderboardBody');
     
-    // Animated background
+    // Animated background - generative field with waves and kinetic typo
     const bgCanvas = document.getElementById('bgCanvas');
+    const kineticLines = document.querySelectorAll('.kinetic-line');
     let ctx = null;
     let dpr = Math.min(window.devicePixelRatio || 1, 2);
     let particles = [];
-    let outlines = [];
+    let waveTime = 0;
     let animationId = null;
     let pointer = { x: window.innerWidth / 2, y: window.innerHeight / 2 };
     let isVisible = document.visibilityState === 'visible';
+    let ripple = null;
+    
+    function isLowPerf() {
+        try {
+            const cores = navigator.hardwareConcurrency || 4;
+            if (cores <= 2) return true;
+        } catch (e) {}
+        return window.innerWidth < 640;
+    }
     
     function initBackground() {
         if (!bgCanvas) return;
@@ -48,9 +58,9 @@ document.addEventListener('DOMContentLoaded', function() {
         dpr = Math.min(window.devicePixelRatio || 1, 2);
         resizeBackground();
         createParticles();
-        createOutlines();
         if (!prefersReducedMotion) {
             startAnimation();
+            initKineticTypography();
         }
     }
     
@@ -60,127 +70,136 @@ document.addEventListener('DOMContentLoaded', function() {
         bgCanvas.height = Math.floor(window.innerHeight * dpr);
         bgCanvas.style.width = window.innerWidth + 'px';
         bgCanvas.style.height = window.innerHeight + 'px';
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+        if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     }
     
     function createParticles() {
         particles = [];
-        const count = 35 + Math.floor(Math.random() * 21); // 35-55
+        const base = isLowPerf() ? 800 : 1800;
+        const count = Math.min(base, Math.floor((window.innerWidth * window.innerHeight) / 800));
         for (let i = 0; i < count; i++) {
             particles.push({
                 x: Math.random() * window.innerWidth,
                 y: Math.random() * window.innerHeight,
-                vx: (Math.random() - 0.5) * 0.25,
-                vy: (Math.random() - 0.5) * 0.25,
-                r: Math.random() * 1.4 + 0.6,
-                accent: Math.random() < 0.18,
-                phase: Math.random() * Math.PI * 2
+                vx: (Math.random() - 0.5) * 0.4,
+                vy: (Math.random() - 0.5) * 0.4,
+                baseR: Math.random() * 1.2 + 0.4,
+                r: Math.random() * 1.2 + 0.4,
+                accent: Math.random() < 0.12,
+                seed: Math.random() * Math.PI * 2
             });
         }
     }
     
-    function createOutlines() {
-        outlines = [];
-        for (let i = 0; i < 3; i++) {
-            outlines.push({
-                x: Math.random() * window.innerWidth,
-                y: Math.random() * window.innerHeight,
-                vx: (Math.random() - 0.5) * 0.12,
-                vy: (Math.random() - 0.5) * 0.12,
-                rot: Math.random() * Math.PI,
-                rotSpeed: (Math.random() - 0.5) * 0.0008,
-                size: 80 + Math.random() * 60
+    function initKineticTypography() {
+        if (typeof gsap === 'undefined') return;
+        kineticLines.forEach((line, idx) => {
+            gsap.set(line, { x: idx % 2 === 0 ? -window.innerWidth * 0.3 : window.innerWidth * 0.3, opacity: 0 });
+            gsap.to(line, {
+                x: idx % 2 === 0 ? window.innerWidth * 0.2 : -window.innerWidth * 0.2,
+                opacity: 0.14,
+                duration: 40 + idx * 15,
+                repeat: -1,
+                ease: 'none'
             });
-        }
+        });
     }
     
     function drawBackground() {
         if (!ctx || prefersReducedMotion || !isVisible) return;
         
+        waveTime += 0.008;
         ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
         
-        // Grid
+        // Flowing waves
         ctx.save();
-        ctx.strokeStyle = 'rgba(218, 215, 208, 0.4)';
-        ctx.lineWidth = 0.5;
-        const gridSize = 40;
-        for (let x = 0; x < window.innerWidth; x += gridSize) {
+        ctx.globalAlpha = 0.18;
+        for (let w = 0; w < 3; w++) {
             ctx.beginPath();
-            ctx.moveTo(x, 0);
-            ctx.lineTo(x, window.innerHeight);
-            ctx.stroke();
-        }
-        for (let y = 0; y < window.innerHeight; y += gridSize) {
-            ctx.beginPath();
-            ctx.moveTo(0, y);
-            ctx.lineTo(window.innerWidth, y);
-            ctx.stroke();
+            const yBase = window.innerHeight * (0.25 + w * 0.25);
+            ctx.moveTo(0, yBase);
+            for (let x = 0; x <= window.innerWidth; x += 4) {
+                const y = yBase + Math.sin((x * 0.01) + waveTime + w) * (20 + w * 12);
+                ctx.lineTo(x, y);
+            }
+            ctx.lineTo(window.innerWidth, window.innerHeight);
+            ctx.lineTo(0, window.innerHeight);
+            ctx.closePath();
+            if (w === 1) {
+                ctx.fillStyle = 'rgba(198, 93, 59, 0.12)';
+            } else {
+                ctx.fillStyle = 'rgba(133, 134, 91, 0.1)';
+            }
+            ctx.fill();
         }
         ctx.restore();
         
-        // Outlines
-        ctx.save();
-        ctx.strokeStyle = 'rgba(133, 134, 91, 0.25)';
-        ctx.lineWidth = 1;
-        for (let i = 0; i < outlines.length; i++) {
-            const o = outlines[i];
-            o.x += o.vx;
-            o.y += o.vy;
-            o.rot += o.rotSpeed;
-            if (o.x < -50) o.x = window.innerWidth + 50;
-            if (o.x > window.innerWidth + 50) o.x = -50;
-            if (o.y < -50) o.y = window.innerHeight + 50;
-            if (o.y > window.innerHeight + 50) o.y = -50;
-            ctx.save();
-            ctx.translate(o.x, o.y);
-            ctx.rotate(o.rot);
-            ctx.strokeRect(-o.size / 2, -o.size / 2, o.size, o.size);
-            ctx.restore();
+        // Ripple effect
+        if (ripple) {
+            ripple.radius += 6;
+            ripple.life -= 0.015;
+            if (ripple.life <= 0) {
+                ripple = null;
+            } else {
+                ctx.save();
+                ctx.globalAlpha = ripple.life * 0.25;
+                ctx.strokeStyle = 'rgba(198, 93, 59, 0.6)';
+                ctx.lineWidth = 1.5;
+                ctx.beginPath();
+                ctx.arc(ripple.x, ripple.y, ripple.radius, 0, Math.PI * 2);
+                ctx.stroke();
+                ctx.restore();
+            }
         }
-        ctx.restore();
         
         // Particles
         for (let i = 0; i < particles.length; i++) {
             const p = particles[i];
             p.x += p.vx;
             p.y += p.vy;
-            if (p.x < 0) p.x = window.innerWidth;
-            if (p.x > window.innerWidth) p.x = 0;
-            if (p.y < 0) p.y = window.innerHeight;
-            if (p.y > window.innerHeight) p.y = 0;
+            if (p.x < -10) p.x = window.innerWidth + 10;
+            if (p.x > window.innerWidth + 10) p.x = -10;
+            if (p.y < -10) p.y = window.innerHeight + 10;
+            if (p.y > window.innerHeight + 10) p.y = -10;
             
             if (!isTouch) {
                 const dx = p.x - pointer.x;
                 const dy = p.y - pointer.y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 140) {
-                    p.vx += (dx / dist) * 0.008;
-                    p.vy += (dy / dist) * 0.008;
+                if (dist < 160) {
+                    p.vx += (dx / dist) * 0.01;
+                    p.vy += (dy / dist) * 0.01;
+                    p.r = p.baseR + (1 - dist / 160) * 0.8;
+                } else {
+                    p.r += (p.baseR - p.r) * 0.05;
                 }
+            } else {
+                p.r += (p.baseR - p.r) * 0.05;
             }
             
             ctx.beginPath();
             ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
             if (p.accent) {
-                ctx.fillStyle = 'rgba(198, 93, 59, 0.5)';
+                ctx.fillStyle = 'rgba(198, 93, 59, 0.55)';
             } else {
-                ctx.fillStyle = 'rgba(133, 134, 91, 0.45)';
+                ctx.fillStyle = 'rgba(133, 134, 91, 0.5)';
             }
             ctx.fill();
         }
         
         // Connections
+        const maxDist = isLowPerf() ? 90 : 120;
         for (let i = 0; i < particles.length; i++) {
             for (let j = i + 1; j < particles.length; j++) {
                 const dx = particles[i].x - particles[j].x;
                 const dy = particles[i].y - particles[j].y;
                 const dist = Math.sqrt(dx * dx + dy * dy);
-                if (dist < 110) {
+                if (dist < maxDist) {
                     ctx.beginPath();
                     ctx.moveTo(particles[i].x, particles[i].y);
                     ctx.lineTo(particles[j].x, particles[j].y);
-                    ctx.strokeStyle = `rgba(198, 93, 59, ${0.1 * (1 - dist / 110)})`;
-                    ctx.lineWidth = 0.4;
+                    ctx.strokeStyle = `rgba(198, 93, 59, ${0.08 * (1 - dist / maxDist)})`;
+                    ctx.lineWidth = 0.3;
                     ctx.stroke();
                 }
             }
