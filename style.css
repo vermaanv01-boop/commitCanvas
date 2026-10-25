@@ -269,9 +269,69 @@ body {
 .language-section,
 .heatmap-section,
 .leaderboard-section,
-.activity-section {
-    padding: 3rem 0;
+.activity-section,
+.story-section {
+    padding: 3.5rem 0;
     border-bottom: 1px solid var(--border);
+}
+
+/* Story section */
+.story-section {
+    padding: 4rem 0;
+}
+
+.story-grid {
+    max-width: 800px;
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    position: relative;
+}
+
+.story-kicker {
+    font-size: 0.8125rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--accent-secondary);
+    font-weight: 500;
+}
+
+.story-title {
+    font-family: 'Space Grotesk', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+}
+
+.story-text {
+    font-size: 1.0625rem;
+    line-height: 1.9;
+    max-width: 650px;
+}
+
+.story-geo {
+    position: absolute;
+    right: -40px;
+    top: 10%;
+    pointer-events: none;
+    display: none;
+}
+
+.story-line {
+    width: 120px;
+    height: 1px;
+    background: var(--accent);
+    transform: rotate(-12deg);
+}
+
+.story-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--accent-secondary);
+    border-radius: 50%;
+    margin-top: 40px;
+    margin-left: 60px;
 }
 
 /* Profile */
@@ -295,6 +355,7 @@ body {
     border: 1px solid var(--border);
     object-fit: cover;
     background: rgba(218, 215, 208, 0.3);
+    will-change: transform;
 }
 
 .profile-info {
@@ -427,8 +488,10 @@ body {
     color: var(--bg);
     border: 1px solid var(--accent);
     cursor: pointer;
-    transition: background 0.2s ease, border-color 0.2s ease, transform 0.1s ease;
+    transition: background 0.2s ease, border-color 0.2s ease;
     white-space: nowrap;
+    position: relative;
+    will-change: transform;
 }
 
 .search-button:hover {
@@ -443,6 +506,12 @@ body {
 
 .search-button:active {
     transform: translateY(1px);
+}
+
+.magnetic-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .form-help {
