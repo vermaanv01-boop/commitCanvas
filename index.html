@@ -170,11 +170,11 @@
             </div>
         </section>
 
-        <section class="leaderboard-section" aria-labelledby="leaderboard-title">
+        <section id="leaderboardSection" class="leaderboard-section" aria-labelledby="leaderboard-title" style="display:none;">
             <div class="section-header">
                 <div class="section-kicker">Repositories</div>
                 <h2 id="leaderboard-title" class="section-title">Repository leaderboard</h2>
-                <p class="section-description">Top repositories by popularity. Columns: repository, language, stars, forks.</p>
+                <p class="section-description">Sorted by stars. Showing name, description, language, stars, and forks.</p>
             </div>
             <div class="leaderboard-panel">
                 <div class="leaderboard-table-wrapper">
@@ -182,18 +182,13 @@
                         <thead>
                             <tr>
                                 <th scope="col">Repository</th>
+                                <th scope="col">Description</th>
                                 <th scope="col">Language</th>
                                 <th scope="col" class="numeric">Stars</th>
                                 <th scope="col" class="numeric">Forks</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr class="placeholder-row">
-                                <td colspan="4" class="placeholder-cell">
-                                    <span class="placeholder-inline">No repository data</span>
-                                    <span class="placeholder-inline-note">Placeholder row — awaits API results</span>
-                                </td>
-                            </tr>
+                        <tbody id="leaderboardBody">
                         </tbody>
                     </table>
                 </div>
@@ -227,7 +222,7 @@
                 <span class="brand-text">CommitCanvas</span>
             </div>
             <div class="footer-meta">
-                <span>GitHub API attribution forthcoming</span>
+                <span>Data from GitHub REST API (public)</span>
                 <span class="footer-sep" aria-hidden="true">·</span>
                 <span>Built with vanilla HTML, CSS, and JavaScript</span>
             </div>
