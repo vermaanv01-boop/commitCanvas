@@ -772,12 +772,22 @@ body {
     }
     
     .search-section,
+    .profile-section,
     .analytics-overview,
     .language-section,
     .heatmap-section,
     .leaderboard-section,
     .activity-section {
         padding: 2.5rem 0;
+    }
+    
+    .profile-card {
+        padding: 1.25rem;
+    }
+    
+    .profile-avatar {
+        width: 80px;
+        height: 80px;
     }
     
     .input-group {
