@@ -222,14 +222,40 @@ document.addEventListener('DOMContentLoaded', function() {
     
     function triggerBackgroundRipple() {
         if (prefersReducedMotion) return;
+        ripple = {
+            x: pointer.x,
+            y: pointer.y,
+            radius: 10,
+            life: 1
+        };
         for (let i = 0; i < particles.length; i++) {
             const p = particles[i];
             const dx = p.x - pointer.x;
             const dy = p.y - pointer.y;
             const dist = Math.sqrt(dx * dx + dy * dy);
-            if (dist < 220) {
-                p.vx += (Math.random() - 0.5) * 0.6;
-                p.vy += (Math.random() - 0.5) * 0.6;
+            if (dist < 260) {
+                p.vx += (dx / dist) * (0.8 * (1 - dist / 260));
+                p.vy += (dy / dist) * (0.8 * (1 - dist / 260));
+            }
+        }
+    }
+    
+    function triggerProfileResponse() {
+        if (prefersReducedMotion) return;
+        ripple = {
+            x: window.innerWidth * 0.3,
+            y: window.innerHeight * 0.4,
+            radius: 15,
+            life: 1
+        };
+        for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            const dx = p.x - window.innerWidth * 0.3;
+            const dy = p.y - window.innerHeight * 0.4;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+            if (dist < 200) {
+                p.vx += (dx / dist) * 0.4;
+                p.vy += (dy / dist) * 0.4;
             }
         }
     }
@@ -245,7 +271,9 @@ document.addEventListener('DOMContentLoaded', function() {
         dpr = Math.min(window.devicePixelRatio || 1, 2);
         resizeBackground();
         createParticles();
-        createOutlines();
+        if (!prefersReducedMotion) {
+            initKineticTypography();
+        }
     });
     
     document.addEventListener('visibilitychange', function() {
