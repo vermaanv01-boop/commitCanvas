@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CommitCanvas — GitHub Developer Analytics and Visualization</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <a class="skip-link" href="#main">Skip to main content</a>
+    
+    <header class="site-header">
+        <nav class="nav-container" aria-label="Primary navigation">
+            <div class="nav-brand">
+                <span class="brand-mark" aria-hidden="true">◼</span>
+                <span class="brand-text">CommitCanvas</span>
+            </div>
+            <div class="nav-meta" aria-label="Project type">
+                <span>GitHub Developer Analytics</span>
+            </div>
+        </nav>
+    </header>
+
+    <main id="main" class="main">
+        <section class="hero" aria-labelledby="hero-title">
+            <div class="hero-grid">
+                <div class="hero-kicker">
+                    <span class="kicker-text">Editorial data studio</span>
+                </div>
+                <h1 id="hero-title" class="hero-title">Your code. Your story.</h1>
+                <p class="hero-subtitle">A structured view of GitHub activity—languages, contributions, and repositories—presented with the precision of a Swiss grid.</p>
+            </div>
+        </section>
+
+        <section class="search-section" aria-labelledby="search-title">
+            <div class="section-header">
+                <div class="section-kicker">Analysis</div>
+                <h2 id="search-title" class="section-title">Profile lookup</h2>
+                <p class="section-description">Enter a GitHub username to explore analytics. Integration pending—inputs are prepared for future API calls.</p>
+            </div>
+            <form id="githubSearchForm" class="search-form" novalidate aria-label="GitHub username search">
+                <div class="form-row">
+                    <label class="form-label" for="githubUsername">GitHub username</label>
+                    <div class="input-group">
+                        <input 
+                            type="text" 
+                            id="githubUsername" 
+                            class="form-input" 
+                            name="username"
+                            autocomplete="username"
+                            placeholder="e.g., octocat"
+                            aria-required="true"
+                            aria-describedby="usernameHelp"
+                        >
+                        <button type="submit" class="search-button">Analyze profile</button>
+                    </div>
+                    <small id="usernameHelp" class="form-help">No data fetched yet. This form is for layout and accessibility.</small>
+                </div>
+            </form>
+            <div id="searchStatus" class="status-region" aria-live="polite" aria-atomic="true"></div>
+        </section>
+
+        <section class="analytics-overview" aria-labelledby="overview-title">
+            <div class="section-header">
+                <div class="section-kicker">Overview</div>
+                <h2 id="overview-title" class="section-title">Four-statistic analytics</h2>
+                <p class="section-description">Key metrics at a glance. Placeholders until live GitHub data is loaded.</p>
+            </div>
+            <div class="stats-grid">
+                <article class="stat-card" aria-labelledby="stat-repos-title">
+                    <div class="stat-header">
+                        <span class="stat-label">Public repositories</span>
+                        <span class="stat-accent" aria-hidden="true">—</span>
+                    </div>
+                    <div id="stat-repos-title" class="stat-value" aria-live="polite">—</div>
+                    <div class="stat-footnote">Placeholder</div>
+                </article>
+                <article class="stat-card" aria-labelledby="stat-stars-title">
+                    <div class="stat-header">
+                        <span class="stat-label">Total stars received</span>
+                        <span class="stat-accent stat-accent-secondary" aria-hidden="true">—</span>
+                    </div>
+                    <div id="stat-stars-title" class="stat-value" aria-live="polite">—</div>
+                    <div class="stat-footnote">Placeholder</div>
+                </article>
+                <article class="stat-card" aria-labelledby="stat-followers-title">
+                    <div class="stat-header">
+                        <span class="stat-label">Followers</span>
+                        <span class="stat-accent" aria-hidden="true">—</span>
+                    </div>
+                    <div id="stat-followers-title" class="stat-value" aria-live="polite">—</div>
+                    <div class="stat-footnote">Placeholder</div>
+                </article>
+                <article class="stat-card" aria-labelledby="stat-following-title">
+                    <div class="stat-header">
+                        <span class="stat-label">Following</span>
+                        <span class="stat-accent stat-accent-secondary" aria-hidden="true">—</span>
+                    </div>
+                    <div id="stat-following-title" class="stat-value" aria-live="polite">—</div>
+                    <div class="stat-footnote">Placeholder</div>
+                </article>
+            </div>
+        </section>
+
+        <section class="language-section" aria-labelledby="lang-title">
+            <div class="section-header">
+                <div class="section-kicker">Distribution</div>
+                <h2 id="lang-title" class="section-title">Programming language distribution</h2>
+                <p class="section-description">Visual breakdown of languages across repositories. Chart area reserved for future rendering.</p>
+            </div>
+            <div class="chart-panel" role="region" aria-label="Language distribution chart placeholder">
+                <div class="chart-placeholder" aria-live="polite">
+                    <div class="placeholder-mark" aria-hidden="true">▦</div>
+                    <div class="placeholder-text">Language distribution chart</div>
+                    <div class="placeholder-subtext">Not implemented — awaiting GitHub API integration</div>
+                </div>
+            </div>
+        </section>
+
+        <section class="heatmap-section" aria-labelledby="heatmap-title">
+            <div class="section-header">
+                <div class="section-kicker">Activity</div>
+                <h2 id="heatmap-title" class="section-title">Contribution activity heatmap</h2>
+                <p class="section-description">Calendar-like visualization of contribution density. Placeholder grid for layout exploration.</p>
+            </div>
+            <div class="heatmap-panel" role="region" aria-label="Contribution heatmap placeholder">
+                <div class="heatmap-grid" aria-hidden="true">
+                    <div class="heatmap-row">
+                        <span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span>
+                    </div>
+                    <div class="heatmap-row">
+                        <span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell heatmap-cell-mid"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell heatmap-cell-high"></span><span class="heatmap-cell"></span>
+                    </div>
+                    <div class="heatmap-row">
+                        <span class="heatmap-cell"></span><span class="heatmap-cell heatmap-cell-mid"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell heatmap-cell-high"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span>
+                    </div>
+                    <div class="heatmap-row">
+                        <span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell heatmap-cell-mid"></span><span class="heatmap-cell heatmap-cell-high"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span>
+                    </div>
+                    <div class="heatmap-row">
+                        <span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span><span class="heatmap-cell heatmap-cell-mid"></span><span class="heatmap-cell"></span><span class="heatmap-cell"></span>
+                    </div>
+                </div>
+                <div class="heatmap-legend" aria-label="Heatmap intensity legend">
+                    <span class="legend-label">Less</span>
+                    <span class="legend-swatch legend-swatch-0" aria-hidden="true"></span>
+                    <span class="legend-swatch legend-swatch-1" aria-hidden="true"></span>
+                    <span class="legend-swatch legend-swatch-2" aria-hidden="true"></span>
+                    <span class="legend-swatch legend-swatch-3" aria-hidden="true"></span>
+                    <span class="legend-label">More</span>
+                </div>
+                <div class="heatmap-note">Placeholder grid — not rendered from actual contribution data</div>
+            </div>
+        </section>
+
+        <section class="leaderboard-section" aria-labelledby="leaderboard-title">
+            <div class="section-header">
+                <div class="section-kicker">Repositories</div>
+                <h2 id="leaderboard-title" class="section-title">Repository leaderboard</h2>
+                <p class="section-description">Top repositories by popularity. Columns: repository, language, stars, forks.</p>
+            </div>
+            <div class="leaderboard-panel">
+                <div class="leaderboard-table-wrapper">
+                    <table class="leaderboard-table" aria-label="Repository leaderboard">
+                        <thead>
+                            <tr>
+                                <th scope="col">Repository</th>
+                                <th scope="col">Language</th>
+                                <th scope="col" class="numeric">Stars</th>
+                                <th scope="col" class="numeric">Forks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr class="placeholder-row">
+                                <td colspan="4" class="placeholder-cell">
+                                    <span class="placeholder-inline">No repository data</span>
+                                    <span class="placeholder-inline-note">Placeholder row — awaits API results</span>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+        <section class="activity-section" aria-labelledby="activity-title">
+            <div class="section-header">
+                <div class="section-kicker">Timeline</div>
+                <h2 id="activity-title" class="section-title">Recent public activity</h2>
+                <p class="section-description">Latest public events and commits. Placeholder list until data is fetched.</p>
+            </div>
+            <div class="activity-panel">
+                <ul class="activity-list" aria-label="Recent activity list">
+                    <li class="activity-item activity-item-placeholder">
+                        <div class="activity-marker" aria-hidden="true"></div>
+                        <div class="activity-content">
+                            <div class="activity-title">Activity feed empty</div>
+                            <div class="activity-meta">Placeholder item — no events loaded</div>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+    </main>
+
+    <footer class="site-footer">
+        <div class="footer-container">
+            <div class="footer-brand">
+                <span class="brand-mark" aria-hidden="true">◼</span>
+                <span class="brand-text">CommitCanvas</span>
+            </div>
+            <div class="footer-meta">
+                <span>GitHub API attribution forthcoming</span>
+                <span class="footer-sep" aria-hidden="true">·</span>
+                <span>Built with vanilla HTML, CSS, and JavaScript</span>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
